@@ -1,10 +1,14 @@
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 public class WorkerFactoryServer implements WorkerFactory {
 
-	Registry registro;
+	static Registry registro;
 
 	// Devuelve un vector de hasta n referencias a objetos Worker.
 	public ArrayList<Worker> dameWorkers(int n) throws RemoteException {
@@ -12,11 +16,16 @@ public class WorkerFactoryServer implements WorkerFactory {
 			 * Se recuperan los nombres asociados al registro
 			 */
 			String[] nombresRegistro = registro.list();
-			ArrayList <WorkerServer> workers = new ArrayList<Worker>();
+			ArrayList<Worker> workers = new ArrayList<Worker>();
 			int numWorkers = 0;
 			for (String nombre : nombresRegistro) {
 				if (nombre.startsWith("Worker")) {
-					workers.add(registro.lookup(nombre));
+					try {
+						workers.add((Worker) registro.lookup(nombre));
+					} catch (NotBoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					numWorkers++;
 				}
 
