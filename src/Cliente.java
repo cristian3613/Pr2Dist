@@ -11,6 +11,7 @@ public class Cliente {
 		Registry registry = LocateRegistry.getRegistry(host);
         WorkerFactory stub = (WorkerFactory) registry.lookup("Factory");
         ArrayList<Worker> response = stub.dameWorkers(3);
+        registry.unbind("Factory");
 	}
 
 }
