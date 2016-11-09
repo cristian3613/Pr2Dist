@@ -4,7 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
-public class LanzarServidor {
+public class LanzarWorker {
 
 	public static void main(String[] args) throws RemoteException, NotBoundException {
 		String host = (args.length < 2) ? null : args[1];

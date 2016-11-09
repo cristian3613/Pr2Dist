@@ -19,29 +19,41 @@ public class WorkerFactoryServer implements WorkerFactory {
 
 	// Devuelve un vector de hasta n referencias a objetos Worker.
 	public ArrayList<Worker> dameWorkers(int n) throws RemoteException {
+		//Se crea la lista vacia que almacenara los workers solicitados
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		/*
 		 * Se recuperan los nombres asociados al registro
 		 */
 		String[] nombresRegistro = registro.list();
 		int numWorkers = 0;
-		for (String nombre : nombresRegistro) {
-			if (nombre.startsWith("Worker")) {
-				try {
-					workers.add((Worker) registro.lookup(nombre));
-				} catch (NotBoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		if (n > 0) {
+			for (String nombre : nombresRegistro) {
+				if (nombre.startsWith("Worker")) {
+					try {
+						//Se anyade worker al vector
+						workers.add((Worker) registro.lookup(nombre));
+					} catch (NotBoundException e) {
+						e.printStackTrace();
+					}
+					numWorkers++;
+					System.out.println("\nSe te ha dado Worker " + numWorkers);
+					if (numWorkers == n)	break;
 				}
-				numWorkers++;
 			}
-
+			//Devolver workers solicitados
+			if (n == numWorkers) {
+				System.out.println("\nWorkers solicitados dados.");
+				return workers;
+			}
+			//Numero de workers solicitados demasiado grande
+			else {
+				System.err.println("\nNumero de workers solicitados demasiado grande.");
+				return new ArrayList<Worker> ();
+			}
 		}
-
-		if (n <= numWorkers) {	//Devolver workers solicitados
-			return workers;
-		}
-		else{	//Numero de workers solicitados demasiado grande
+		//Cuando piden un numero de workers <=0
+		else {
+			System.err.println("\nNumero de workers solicitados demasiado pequenyo.");
 			return new ArrayList<Worker> ();
 		}
 	}
@@ -49,9 +61,9 @@ public class WorkerFactoryServer implements WorkerFactory {
 	public static void ejecutar(String host) {
 		try {
 			if (host == null) {
-				System.out.println("Se ejecuta el FactoryServer en puerto 1099");
+				System.out.println("El registro RMI se encuentra en port 1099");
 			}
-			else	System.out.println("Se ejecuta en " + host);
+			else	System.out.println("El registro RMI se encuentra en " + host);
 			WorkerFactoryServer obj = new WorkerFactoryServer(host);
 			WorkerFactory stub = (WorkerFactory) UnicastRemoteObject.exportObject(obj, 0);
 			/*
@@ -64,7 +76,7 @@ public class WorkerFactoryServer implements WorkerFactory {
 			 */
 			registro.bind("Factory", stub);
 			System.out.println("Factory");
-			System.err.println("Server ready");
+			System.err.println("FactoryServer ready");
 		}
 		catch (Exception e) {
 			e.printStackTrace();

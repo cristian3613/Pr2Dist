@@ -9,8 +9,8 @@ public class Cliente {
 	public static void main(String[] args) throws RemoteException, NotBoundException {
 		String host = (args.length < 2) ? null : args[1];
 		Registry registry = LocateRegistry.getRegistry(host);
-        Worker stub = (Worker) registry.lookup("Worker 1");
-        ArrayList<Integer> response = stub.encuentraPrimos(1, 15);
+        WorkerFactory stub = (WorkerFactory) registry.lookup("Factory");
+        ArrayList<Worker> response = stub.dameWorkers(3);
 	}
 
 }
