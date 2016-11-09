@@ -17,11 +17,13 @@ public class WorkerServer implements Worker {
 	/**
 	 * Devuelve un vector con los primos entre min y max
 	 */
-	public ArrayList<Integer> encuentraPrimos(int min, int max)
+	public ArrayList<Integer> encuentraPrimos(int min, int max, 
+			ArrayList<Integer> primosCandidatos)
 			throws RemoteException {
 		ArrayList<Integer> listaPrimos = new ArrayList<Integer>();
-		for (int i = min; i <= max; i++) {
-			if (esPrimo(i)) {
+		if ((min % 2 )== 0) min++;
+		for (int i = min; i <= max; i+=2) {
+			if (esPrimo(i, primosCandidatos)) {
 				listaPrimos.add(i);
 			}
 		}
@@ -35,7 +37,37 @@ public class WorkerServer implements Worker {
 	 * 
 	 * Code extracted from: http://www.crunchify.com
 	 */
-	private boolean esPrimo(int num) {
+	private boolean esPrimo(int num, ArrayList<Integer> primosCandidatos) {
+		//El bucle empieza desde el 2 (primer primo)
+		for (int candidato : primosCandidatos) {
+			if (num%candidato == 0)	return false;
+			if (candidato > num/2) break;
+		}
+		return true;
+	}
+	
+	/**
+	 * Devuelve un vector con los primos entre min y max
+	 */
+	public ArrayList<Integer> encuentraPrimos2(int min, int max)
+			throws RemoteException {
+		ArrayList<Integer> listaPrimos = new ArrayList<Integer>();
+		for (int i = min; i <= max; i++) {
+			if (esPrimo2(i)) {
+				listaPrimos.add(i);
+			}
+		}
+		System.out.println("Numeros primos entre " + min + " y " + max +
+				" calculados");
+		return listaPrimos;
+	}
+
+	/**
+	 * Devuelve true si el numero pasado como parametro es primo
+	 * 
+	 * Code extracted from: http://www.crunchify.com
+	 */
+	private boolean esPrimo2(int num) {
 		//El bucle empieza desde el 2 (primer primo)
 		for (int i = 2; i <= num/2; i++) {
 			if (num%i == 0)	return false;

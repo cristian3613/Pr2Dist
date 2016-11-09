@@ -16,7 +16,8 @@ public class Gestor implements Runnable {
 
 	public void run(){
 		try{
-			ArrayList<Integer> primosSubrango = worker.encuentraPrimos(min, max);
+			ArrayList<Integer> primosSubrango = worker.encuentraPrimos(min, max,
+					Cliente.candidatos);
 			/*
 			 * Se anyade a la lista final de primos, los primos calculados del
 			 * subrango dado
