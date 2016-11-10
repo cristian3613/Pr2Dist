@@ -24,9 +24,13 @@ public class Cliente {
 			int max = Integer.parseInt(args[1]);
 			int n = Integer.parseInt(args[2]);
 			
-			if (min < 3) primos.add(2);
+			if (min < 3) {
+				primos.add(2);
+				min = 3;
+			}
+			
 			//INICIALIZACION LISTA
-			for (int i=3; i <= (max - min)/2 ; i += 2){
+			for (int i=3; i <= max/2 ; i += 2){
 				candidatos.add(i);
 			}
 				
@@ -44,12 +48,12 @@ public class Cliente {
 			
 			Monitor monitor = new Monitor(workers);
 			int numWorkers = workers.size();
-			int numsAnalizar = max - min + 1;
+			int numsAnalizar = max - min;
 			//int divisor = (numWorkers * 2);
 			int manda = numsAnalizar / numWorkers ; // MAL REPARTO
 			//int sobra = numsAnalizar % divisor;
 			int limite = manda / numWorkers;
-			int intervalo = min + manda;
+			int intervalo = min + manda - 1;
 			if (intervalo > max) intervalo = max;
 			Worker work;
 			Gestor gestor;
@@ -57,11 +61,11 @@ public class Cliente {
 			
 			while (intervalo < max){
 				work = monitor.daWorker();
-				System.out.println("Probando "+ min+ "y "+ intervalo);
+				System.out.println("Intervalo "+ min+ "y "+ intervalo);
 				gestor = new Gestor(work, min, intervalo , monitor);
 				thread = new Thread(gestor);
 				thread.start();
-				min = intervalo;
+				min = intervalo + 1;
 				manda = manda - (manda / numWorkers);
 				if (manda < limite) manda = limite;
 				intervalo += manda;

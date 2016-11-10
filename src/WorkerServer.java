@@ -40,8 +40,8 @@ public class WorkerServer implements Worker {
 	private boolean esPrimo(int num, ArrayList<Integer> primosCandidatos) {
 		//El bucle empieza desde el 2 (primer primo)
 		for (int candidato : primosCandidatos) {
-			if (num%candidato == 0)	return false;
 			if (candidato > num/2) break;
+			if (num%candidato == 0)	return false;
 		}
 		return true;
 	}
