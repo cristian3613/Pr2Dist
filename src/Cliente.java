@@ -12,56 +12,35 @@ import java.util.Collections;
 public class Cliente {
 
 	static ArrayList<Integer> primos = new ArrayList<Integer>(); //EXCLUSION MUTUA
-	static ArrayList<Integer> candidatos = new ArrayList<Integer>(); //EXCLUSION MUTUA
 
-	public static void main(String[] args) throws RemoteException,
-			NotBoundException {
+	public static void ejecutar(int min, int max, int n, String host) throws RemoteException,
+	NotBoundException {
 		try {
-			/*
-			 * Se leen parametros pasados
-			 */
-			int min = Integer.parseInt(args[0]);
-			int max = Integer.parseInt(args[1]);
-			int n = Integer.parseInt(args[2]);
-			
-			if (min < 3) {
-				primos.add(2);
-				min = 3;
-			}
-			
-			//INICIALIZACION LISTA
-			for (int i=3; i <= max/2 ; i += 2){
-				candidatos.add(i);
-			}
-				
-
+			//Se guardan los rangos iniciales y el numero de servidores
 			int minRango = min;
 			int maxRango = max;
 			int nPedidos = n;
-
-			String host = (args.length < 4) ? null : args[3];
+			//Se obtiene el registro RMI almacenado en host
 			Registry registry = LocateRegistry.getRegistry(host);
-
+			//Se recupera el servidor de asignacion
 			WorkerFactory servAsig = (WorkerFactory) registry.lookup("Factory");
-
+			//Se adquieren los servidores de calculo pedidos
 			ArrayList<Worker> workers = servAsig.dameWorkers(n);
-			
+			//Se crea el objeto que gestionara la concurrencia
 			Monitor monitor = new Monitor(workers);
-			int numWorkers = workers.size();
+			final int numWorkers = workers.size();
 			int numsAnalizar = max - min;
-			//int divisor = (numWorkers * 2);
-			int manda = numsAnalizar / numWorkers ; // MAL REPARTO
-			//int sobra = numsAnalizar % divisor;
+			int manda = numsAnalizar / numWorkers;
 			int limite = manda / numWorkers;
 			int intervalo = min + manda - 1;
 			if (intervalo > max) intervalo = max;
 			Worker work;
 			Gestor gestor;
 			Thread thread;
-			
-			while (intervalo < max){
+
+			while (intervalo < max) {
 				work = monitor.daWorker();
-				System.out.println("Intervalo "+ min+ "y "+ intervalo);
+				System.out.println("Intervalo "+min+ " y "+intervalo);
 				gestor = new Gestor(work, min, intervalo , monitor);
 				thread = new Thread(gestor);
 				thread.start();
@@ -76,18 +55,24 @@ public class Cliente {
 					thread = new Thread(gestor);
 					thread.start();
 					break;
-				}
-				
+				}	
 			}
-			while(monitor.tamanyo() != numWorkers) { /*BLOQUEADO hasta que no acaben*/ }
+			System.out.println("Esperando a que acaben todos servidores de calcular...");
+			/* 
+			 * BLOQUEADO hasta que no acaben 
+			 */ 
+			while(monitor.tamanyo() < numWorkers)	Thread.sleep(1);
 			Collections.sort(primos);
-			 System.out.println("\nPRIMOS CALCULADOS Y ORDENADOS DEL RANGO ["
-			  + minRango + ", " + maxRango + "] utilizando " + nPedidos +
-			  " SERVIDORES" + " de calculo:\n");
-			 System.out.println(primos);
+			System.out.println("\nPRIMOS CALCULADOS Y ORDENADOS DEL RANGO ["
+					+ minRango + ", " + maxRango + "] utilizando " + nPedidos +
+					" SERVIDORES" + " de calculo:\n");
+			/*
+			 * Se imprimen los primos obtenidos
+			 */
+			System.out.println(primos);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("ERROR");
+			System.err.println("ERROR en Main");
 		}
 	}
 

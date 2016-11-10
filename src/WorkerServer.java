@@ -13,47 +13,15 @@ public class WorkerServer implements Worker {
 	}
 
 	public String getDireccion() {	return direccion;	}
-
-	/**
-	 * Devuelve un vector con los primos entre min y max
-	 */
-	public ArrayList<Integer> encuentraPrimos(int min, int max, 
-			ArrayList<Integer> primosCandidatos)
-			throws RemoteException {
-		ArrayList<Integer> listaPrimos = new ArrayList<Integer>();
-		if ((min % 2 )== 0) min++;
-		for (int i = min; i <= max; i+=2) {
-			if (esPrimo(i, primosCandidatos)) {
-				listaPrimos.add(i);
-			}
-		}
-		System.out.println("Numeros primos entre " + min + " y " + max +
-				" calculados");
-		return listaPrimos;
-	}
-
-	/**
-	 * Devuelve true si el numero pasado como parametro es primo
-	 * 
-	 * Code extracted from: http://www.crunchify.com
-	 */
-	private boolean esPrimo(int num, ArrayList<Integer> primosCandidatos) {
-		//El bucle empieza desde el 2 (primer primo)
-		for (int candidato : primosCandidatos) {
-			if (candidato > num/2) break;
-			if (num%candidato == 0)	return false;
-		}
-		return true;
-	}
 	
 	/**
 	 * Devuelve un vector con los primos entre min y max
 	 */
-	public ArrayList<Integer> encuentraPrimos2(int min, int max)
+	public ArrayList<Integer> encuentraPrimos(int min, int max)
 			throws RemoteException {
 		ArrayList<Integer> listaPrimos = new ArrayList<Integer>();
 		for (int i = min; i <= max; i++) {
-			if (esPrimo2(i)) {
+			if (esPrimo(i)) {
 				listaPrimos.add(i);
 			}
 		}
@@ -65,14 +33,17 @@ public class WorkerServer implements Worker {
 	/**
 	 * Devuelve true si el numero pasado como parametro es primo
 	 * 
-	 * Code extracted from: http://www.crunchify.com
+	 * Code extracted from:
+	 * 	http://codereview.stackexchange.com/
+	 * 	questions/24704/efficiently-determining-if-a-number-is-prime
 	 */
-	private boolean esPrimo2(int num) {
-		//El bucle empieza desde el 2 (primer primo)
-		for (int i = 2; i <= num/2; i++) {
-			if (num%i == 0)	return false;
-		}
-		return true;
+	private static boolean esPrimo(int num) {
+    	if (num > 2 && num%2 == 0)	return false;
+    	int top = (int)Math.sqrt(num) + 1;
+    	for(int i = 3; i < top; i+=2) {
+    		if(num % i == 0)	return false;
+    	}
+    	return true; 
 	}
 	
 	/**
@@ -103,7 +74,7 @@ public class WorkerServer implements Worker {
 			/*
 			 * Se asocia un nombre al objeto remoto creado
 			 */
-			registro.bind("Worker " + numWorkers, stub);
+			registro.rebind("Worker " + numWorkers, stub);
 			System.out.println("Worker " + numWorkers);
 			System.err.println("Server ready");
 		}
