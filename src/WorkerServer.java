@@ -20,7 +20,12 @@ public class WorkerServer implements Worker {
 	public ArrayList<Integer> encuentraPrimos(int min, int max)
 			throws RemoteException {
 		ArrayList<Integer> listaPrimos = new ArrayList<Integer>();
-		for (int i = min; i <= max; i++) {
+		if (min < 3) {
+			min = 3;
+			listaPrimos.add(2);
+		}
+		else if ((min%2) == 0) min++;
+		for (int i = min; i <= max; i+=2) {
 			if (esPrimo(i)) {
 				listaPrimos.add(i);
 			}
@@ -38,7 +43,7 @@ public class WorkerServer implements Worker {
 	 * 	questions/24704/efficiently-determining-if-a-number-is-prime
 	 */
 	private static boolean esPrimo(int num) {
-    	if (num > 2 && num%2 == 0)	return false;
+    	//if (num > 2 && num%2 == 0)	return false;
     	int top = (int)Math.sqrt(num) + 1;
     	for(int i = 3; i < top; i+=2) {
     		if(num % i == 0)	return false;
